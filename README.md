@@ -70,9 +70,10 @@ Secrets e credenciais serão tratados com controles específicos de gestão de s
 ## Documentação
 
 - [Passo 1 — Definição da POC](docs/01-definicao-da-poc.md)
+- [Passo 2 — Matriz de Boas Práticas](docs/02-matriz-boas-praticas.md)
 
 ## Status
 
-**Etapa atual:** definição conceitual da POC.
+**Etapa atual:** matriz de boas práticas e definição dos controles do MVP.
 
-A próxima etapa será a criação da matriz de boas práticas que serão efetivamente demonstradas e validadas.
+A próxima etapa será definir a **arquitetura mínima da POC**, especificando apenas os componentes necessários para demonstrar os controles selecionados.
