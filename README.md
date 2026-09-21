@@ -2,7 +2,7 @@
 
 ## Sobre a POC
 
-Esta POC estuda a aplicação de **boas práticas de Security by Design ao desenvolvimento assistido por Inteligência Artificial**, com atenção aos pequenos detalhes de configuração, acesso, código e infraestrutura que podem ampliar silenciosamente a superfície de ataque.
+Esta POC estuda a aplicação de **boas práticas de Security by Design ao ciclo de desenvolvimento assistido por Inteligência Artificial**, desde requisitos e especificação até código, dependências, infraestrutura e operação, com atenção aos pequenos detalhes que podem ampliar silenciosamente a superfície de ataque.
 
 A proposta não é tratar a IA como necessariamente insegura nem adicionar ferramentas de segurança sem justificativa. O foco é demonstrar como boas práticas podem acompanhar o desenvolvimento desde a geração ou modificação de artefatos com IA até sua validação e execução na infraestrutura.
 
@@ -12,10 +12,15 @@ A proposta não é tratar a IA como necessariamente insegura nem adicionar ferra
 
 > **IA auxilia. Boas práticas orientam. Segurança valida.**
 
+> **Não basta perguntar se funciona. É preciso perguntar se precisa existir.**
+
 ## Problema
 
 Ferramentas de IA podem auxiliar na geração de código, scripts, Dockerfiles, pipelines, manifests Kubernetes e outras configurações. Mesmo quando esses artefatos funcionam corretamente, pequenos detalhes podem introduzir riscos, como:
 
+- requisitos excessivos ou sem necessidade real;
+- validação de IA feita somente por outra IA;
+- bibliotecas, imagens ou APIs desatualizadas;
 - secrets incorporados ao código;
 - permissões excessivas;
 - containers executados como root;
@@ -38,16 +43,22 @@ Demonstrar como boas práticas de Security by Design podem ser incorporadas ao d
 ## Fluxo inicial
 
 ```text
-Desenvolvedor
+Necessidade real
       |
       v
-      IA
+Requisitos / Especificação
+      |
+      v
+Desenvolvedor + IA
       |
       v
 Código / Configuração / Infraestrutura
       |
       v
-Validações de segurança
+Minimização + Validação independente
+      |
+      v
+Rastreabilidade
       |
       v
      Git
@@ -63,6 +74,9 @@ Validações de segurança
       |
       v
  Aplicação
+      |
+      v
+Operação / Evolução
 ```
 
 Secrets e credenciais serão tratados com controles específicos de gestão de segredos, incluindo **OpenBao** quando aplicável.
