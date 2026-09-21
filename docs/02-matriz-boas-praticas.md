@@ -49,7 +49,9 @@ O primeiro objetivo é construir uma POC pequena, reproduzível e capaz de produ
 
 | Prioridade | Camada | Pequeno detalhe observado | Risco | Boa prática | Validação proposta | Evidência |
 |---|---|---|---|---|---|---|
+| P0 | Requisitos | Requisito excessivo, ambíguo ou sem necessidade real | Implementação desnecessária, aumento de complexidade e superfície de ataque | Validar necessidade, escopo e critérios de aceitação antes da geração | Checklist de requisitos + comparação entre requisito inicial e refinado | Requisito antes/depois e justificativa das remoções |
 | P0 | IA | Secret, token ou dado interno enviado no prompt | Exposição de informação sensível a um serviço externo | Nunca fornecer credenciais ou dados sensíveis reais à IA | Checklist e exemplos controlados de prompt seguro/inseguro | Comparação documentada dos prompts |
+| P0 | IA / Validação | Uma IA é o único mecanismo de revisão da saída de outra IA | Erros ou decisões inadequadas podem ser reforçados sem verificação independente | Utilizar testes, scanners, políticas ou revisão humana como mecanismo adicional | Comparar revisão por IA com validação determinística | Registro da revisão e resultado independente |
 | P0 | Git | Secret incluído em arquivo versionado | Vazamento de credenciais pelo histórico Git | Não versionar secrets; utilizar variáveis e secret stores | Gitleaks | Relatório antes/depois |
 | P0 | Docker | Container executado como root | Maior impacto em caso de comprometimento | Executar processo com usuário não privilegiado | Dockerfile + `docker inspect` + Hadolint | UID do processo e análise do Dockerfile |
 | P0 | Docker | Imagem ou dependência com vulnerabilidade conhecida | Uso de componente vulnerável | Verificar imagens e dependências antes do deploy | Trivy | Relatório de vulnerabilidades |
@@ -59,7 +61,9 @@ O primeiro objetivo é construir uma POC pequena, reproduzível e capaz de produ
 | P0 | Kubernetes | ServiceAccount token montado sem necessidade | Credencial do cluster disponível para aplicação que não precisa dela | Desabilitar automount quando não necessário | Revisão de YAML + validação do manifest | YAML antes/depois |
 | P0 | Secrets | Credencial fixa armazenada em arquivo/configuração | Vazamento e dificuldade de rotação | Centralizar secrets e recuperar credenciais em tempo de execução | OpenBao | Secret removido do código e recuperação controlada |
 | P1 | CI/CD | Token do pipeline com permissões amplas | Comprometimento do repositório ou pipeline com privilégios excessivos | Aplicar menor privilégio às permissões do workflow | Revisão de `permissions` no workflow | Workflow antes/depois |
+| P0 | Dependências | Biblioteca, imagem ou API desatualizada/obsoleta sugerida ou mantida no projeto | Vulnerabilidades conhecidas, incompatibilidade ou dependência sem manutenção | Verificar necessidade, versão suportada, origem e vulnerabilidades antes de incorporar | Inventário + Trivy + verificação de versão/documentação | Dependência antes/depois e justificativa da versão |
 | P1 | Dependências | Dependência desnecessária incluída no projeto | Aumento da superfície de ataque e manutenção | Remover componentes não utilizados | Inventário + análise de dependências | Lista antes/depois |
+| P1 | Proveniência | Não há registro claro da origem ou alteração relevante de um artefato | Dificuldade de auditoria, manutenção e responsabilização | Registrar origem, versão e histórico de mudanças dos artefatos | Git + documentação; SBOM quando aplicável | Histórico e inventário reproduzível |
 | P1 | Kubernetes | Container com filesystem gravável sem necessidade | Persistência/modificação indevida dentro do container | Utilizar filesystem somente leitura quando aplicável | Manifest + validação em execução | Configuração e teste |
 | P1 | Logs | Token, senha ou dado sensível registrado em log | Vazamento indireto de informação | Sanitizar e minimizar logs | Teste controlado e inspeção dos logs | Log inseguro vs. log corrigido |
 | P1 | Imagens | Tag genérica como `latest` | Build/deploy não determinístico | Utilizar versão explícita ou digest quando aplicável | Revisão automática/manual | Manifest/Dockerfile corrigido |
@@ -73,15 +77,18 @@ A primeira versão da POC deverá demonstrar somente os controles **P0**.
 
 Isso significa que o MVP terá os seguintes pontos:
 
-1. uso seguro de IA sem exposição de secrets;
-2. detecção de secrets no Git;
-3. container executado sem root;
-4. análise de vulnerabilidades da imagem;
-5. minimização de portas expostas;
-6. security gate no CI/CD;
-7. restrições básicas de segurança no Kubernetes;
-8. redução do uso desnecessário de ServiceAccount tokens;
-9. gestão de secrets com OpenBao.
+1. validação de necessidade e requisitos antes da implementação;
+2. uso seguro de IA sem exposição de secrets;
+3. validação independente de artefatos gerados ou revisados por IA;
+4. detecção de secrets no Git;
+5. container executado sem root;
+6. análise de vulnerabilidades da imagem;
+7. controle de bibliotecas, imagens e componentes desatualizados;
+8. minimização de portas expostas;
+9. security gate no CI/CD;
+10. restrições básicas de segurança no Kubernetes;
+11. redução do uso desnecessário de ServiceAccount tokens;
+12. gestão de secrets com OpenBao.
 
 Esses controles foram escolhidos porque atravessam o fluxo completo da POC e permitem demonstrar a diferença entre uma aplicação que apenas funciona e uma aplicação que funciona com decisões de segurança incorporadas.
 
@@ -199,7 +206,20 @@ VALIDADO
 
 ---
 
-## 8. Evidências esperadas
+## 8. Critérios transversais de controle humano
+
+Além dos controles individuais, os experimentos deverão observar quatro critérios:
+
+- **Rastreabilidade:** é possível identificar origem, alteração e justificativa?
+- **Confiabilidade:** existe evidência independente de que o controle foi atendido?
+- **Compreensibilidade:** a pessoa responsável consegue explicar e operar o artefato?
+- **Evolução:** o artefato pode ser atualizado e mantido de forma controlada?
+
+Esses critérios deverão ser considerados principalmente nos artefatos produzidos ou modificados com auxílio de IA.
+
+---
+
+## 9. Evidências esperadas
 
 A POC deverá priorizar evidências simples e auditáveis, como:
 
@@ -216,7 +236,7 @@ A POC deverá priorizar evidências simples e auditáveis, como:
 
 ---
 
-## 9. O que esta etapa evita
+## 10. O que esta etapa evita
 
 A matriz foi criada também para evitar alguns desvios comuns:
 
@@ -229,7 +249,7 @@ A matriz foi criada também para evitar alguns desvios comuns:
 
 ---
 
-## 10. Resultado do Passo 2
+## 11. Resultado do Passo 2
 
 Ao final desta etapa ficam definidos:
 
