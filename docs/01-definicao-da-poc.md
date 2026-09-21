@@ -2,42 +2,58 @@
 
 ## 1. Tema central
 
-**Boas práticas de Security by Design aplicadas ao desenvolvimento assistido por IA, com atenção aos pequenos detalhes de configuração, acesso, código e infraestrutura que podem ampliar silenciosamente a superfície de ataque.**
+**Boas práticas de Security by Design aplicadas ao ciclo de desenvolvimento assistido por IA, desde a definição de requisitos até a operação, com atenção aos pequenos detalhes de configuração, acesso, código, dependências e infraestrutura que podem ampliar silenciosamente a superfície de ataque.**
 
 A POC parte da ideia de que segurança não depende apenas da existência de ferramentas específicas de proteção.
 
-Muitos riscos surgem de pequenas decisões tomadas durante o desenvolvimento, como uma permissão mais ampla que o necessário, uma credencial armazenada de forma inadequada, uma configuração padrão insegura, uma dependência vulnerável ou um container executado com privilégios excessivos.
+Muitos riscos surgem de pequenas decisões tomadas durante o desenvolvimento, como uma permissão mais ampla que o necessário, uma credencial armazenada de forma inadequada, uma configuração padrão insegura, uma dependência vulnerável ou desatualizada, uma funcionalidade sem necessidade real ou um container executado com privilégios excessivos.
 
-Com o aumento do desenvolvimento assistido por Inteligência Artificial, esses detalhes se tornam ainda mais relevantes, pois código e configurações podem ser produzidos em grande velocidade e posteriormente incorporados ao ambiente sem uma análise adequada.
+Com o aumento do desenvolvimento assistido por Inteligência Artificial, esses detalhes se tornam ainda mais relevantes, pois requisitos, código, configurações e infraestrutura podem ser produzidos ou modificados em grande velocidade e posteriormente incorporados ao ambiente sem análise suficiente.
 
 ---
 
 ## 2. Problema
 
-Ferramentas de Inteligência Artificial estão sendo utilizadas para auxiliar na criação de código, scripts, Dockerfiles, pipelines, manifests Kubernetes, configurações de infraestrutura e na resolução de problemas técnicos.
+Ferramentas de Inteligência Artificial já podem participar de várias etapas do desenvolvimento de software, incluindo:
 
-Esses artefatos podem funcionar corretamente e, ainda assim, conter pequenas decisões que não seguem boas práticas de segurança.
+- definição e refinamento de requisitos;
+- geração e modificação de código;
+- criação de scripts;
+- Dockerfiles;
+- pipelines;
+- manifests Kubernetes;
+- documentação;
+- análise de dados;
+- testes;
+- revisão e correção de código;
+- configurações de infraestrutura.
+
+Esses artefatos podem funcionar corretamente e, ainda assim, conter decisões que não seguem boas práticas de segurança ou de engenharia.
 
 Exemplos incluem:
 
+- requisitos incompletos, excessivos ou ambíguos;
+- funcionalidades implementadas sem necessidade real;
 - secrets incorporados diretamente ao código;
 - permissões excessivas;
 - containers executados como root;
-- imagens ou dependências vulneráveis;
-- portas e serviços expostos desnecessariamente;
+- bibliotecas, imagens ou APIs vulneráveis, obsoletas ou desatualizadas;
+- dependências desnecessárias;
+- portas e serviços expostos sem necessidade;
 - configurações Kubernetes excessivamente permissivas;
 - informações sensíveis registradas em logs;
 - tokens sem limitação adequada;
 - credenciais compartilhadas;
 - configurações padrão mantidas sem revisão;
 - dados internos fornecidos à IA durante uma solicitação;
-- código ou infraestrutura gerados pela IA utilizados sem validação.
+- uma IA validando a saída de outra IA sem mecanismo independente de verificação;
+- código ou infraestrutura gerados por IA utilizados sem compreensão suficiente por quem irá operar o sistema.
 
-Isoladamente, alguns desses problemas podem parecer pequenos. Quando combinados, entretanto, podem aumentar significativamente a superfície de ataque da aplicação.
+Isoladamente, alguns desses problemas podem parecer pequenos. Quando combinados, entretanto, podem aumentar significativamente a superfície de ataque e reduzir a capacidade humana de compreender, operar e evoluir o sistema.
 
 ### Pergunta central
 
-**Como aplicar boas práticas de Security by Design ao desenvolvimento assistido por Inteligência Artificial, identificando e reduzindo pequenos riscos de configuração, código, acesso e infraestrutura antes que eles alcancem o ambiente de produção?**
+**Como aplicar boas práticas de Security by Design ao ciclo de desenvolvimento assistido por Inteligência Artificial, mantendo rastreabilidade, confiabilidade, compreensibilidade e controle humano enquanto pequenos riscos são identificados e reduzidos antes de alcançar a produção?**
 
 ---
 
@@ -49,6 +65,8 @@ Entretanto:
 
 **Funcionar não significa estar seguro.**
 
+Um requisito pode parecer completo.
+
 Um código pode compilar.
 
 Um container pode iniciar.
@@ -57,19 +75,23 @@ Um deployment pode funcionar.
 
 Uma aplicação pode responder corretamente.
 
-E ainda assim existirem configurações inseguras que não são imediatamente perceptíveis.
+E ainda assim existirem decisões desnecessárias, dependências inadequadas ou configurações inseguras que não são imediatamente perceptíveis.
+
+A IA não será tratada como o problema. Ela pode reduzir tempo, apoiar análise e aumentar produtividade. O problema surge quando sua velocidade é acompanhada por pouca compreensão, pouca validação ou ausência de critérios sobre o que realmente precisa existir.
 
 Por isso, esta POC considera que:
 
 **A segurança está também nos pequenos detalhes que normalmente não são percebidos durante o desenvolvimento.**
 
-O objetivo não será impedir o uso de IA, mas estabelecer um processo no qual aquilo que é produzido ou alterado com auxílio de IA seja analisado antes de avançar dentro do ciclo de desenvolvimento.
+E acrescenta uma segunda pergunta:
+
+**Não basta perguntar se funciona. É preciso perguntar se precisa existir.**
 
 ---
 
 ## 4. Objetivo geral
 
-Demonstrar como boas práticas de **Security by Design** podem ser incorporadas ao desenvolvimento assistido por Inteligência Artificial para identificar, prevenir e reduzir riscos presentes em pequenos detalhes de código, configuração, acesso e infraestrutura.
+Demonstrar como boas práticas de **Security by Design** podem ser incorporadas ao ciclo de desenvolvimento assistido por Inteligência Artificial para identificar, prevenir e reduzir riscos presentes em requisitos, código, dependências, configuração, acesso e infraestrutura, preservando controle humano e capacidade de operação e evolução do sistema.
 
 A POC utilizará prioritariamente tecnologias e ferramentas open source para implementar ou validar esses controles.
 
@@ -79,11 +101,14 @@ A POC utilizará prioritariamente tecnologias e ferramentas open source para imp
 
 A POC deverá demonstrar como:
 
+- avaliar a necessidade real de funcionalidades, componentes e dependências antes de incorporá-los;
+- melhorar a clareza e a validação de requisitos antes da geração de código;
 - identificar configurações inseguras que podem passar despercebidas durante o desenvolvimento;
 - evitar exposição de credenciais e secrets;
 - reduzir privilégios desnecessários;
 - verificar código produzido ou modificado com auxílio de IA;
-- analisar dependências e componentes open source utilizados pela aplicação;
+- evitar que uma segunda IA seja o único mecanismo de validação da primeira;
+- analisar dependências e componentes open source quanto à necessidade, origem, atualização e vulnerabilidades;
 - verificar boas práticas em Dockerfiles e containers;
 - verificar boas práticas em configurações Kubernetes;
 - controlar o acesso de aplicações e serviços aos recursos da infraestrutura;
@@ -93,7 +118,9 @@ A POC deverá demonstrar como:
 - incorporar verificações de segurança ao CI/CD;
 - impedir que determinadas falhas avancem no pipeline;
 - produzir evidências das verificações realizadas;
-- demonstrar a diferença entre apenas executar uma aplicação e executá-la seguindo boas práticas de segurança.
+- manter rastreabilidade das alterações e decisões;
+- favorecer a compreensão, operação e evolução dos artefatos produzidos;
+- demonstrar a diferença entre apenas executar uma aplicação e executá-la seguindo boas práticas de segurança e engenharia.
 
 ---
 
@@ -101,7 +128,11 @@ A POC deverá demonstrar como:
 
 ### Security by Design
 
-A segurança deve fazer parte das decisões de desenvolvimento desde o início, e não ser adicionada somente depois que o sistema estiver pronto.
+A segurança deve fazer parte das decisões de desenvolvimento desde o início, inclusive durante a definição de requisitos, e não ser adicionada somente depois que o sistema estiver pronto.
+
+### Necessidade antes da implementação
+
+Antes de proteger um novo componente, deve-se perguntar se ele realmente precisa existir.
 
 ### Least Privilege
 
@@ -117,11 +148,27 @@ Sempre que possível, configurações devem partir de opções mais restritivas 
 
 ### Minimização
 
-Serviços, portas, permissões, dependências e acessos que não forem necessários devem ser removidos.
+Serviços, rotas, portas, permissões, dependências, funcionalidades e acessos que não forem necessários devem ser removidos.
 
-### Validação
+### Validação independente
 
-Artefatos gerados por humanos ou por IA não devem ser considerados seguros simplesmente porque funcionam.
+Uma saída gerada por IA não deve ser considerada validada somente porque outra IA a revisou. Sempre que aplicável, deverão existir testes, políticas, scanners, verificações determinísticas ou revisão humana.
+
+### Rastreabilidade
+
+Deve ser possível compreender o que foi alterado, quando, por qual processo e com qual justificativa.
+
+### Compreensibilidade
+
+Quem opera o sistema deve ser capaz de entender os artefatos e decisões relevantes para sua execução e segurança.
+
+### Confiabilidade
+
+O avanço de um artefato deve depender de evidências verificáveis, e não apenas de sua aparência de correção.
+
+### Evolução
+
+O sistema deve poder ser atualizado, corrigido e mantido sem depender cegamente da reprodução de uma resposta anterior de IA.
 
 ---
 
@@ -131,16 +178,21 @@ A Inteligência Artificial será considerada uma ferramenta de apoio ao desenvol
 
 Ela poderá auxiliar na produção ou modificação de:
 
+- requisitos e especificações;
 - código;
 - scripts;
 - Dockerfiles;
 - arquivos YAML;
 - configurações Kubernetes;
 - pipelines;
+- testes;
 - documentação;
-- configurações de infraestrutura.
+- configurações de infraestrutura;
+- análise e correção de artefatos.
 
 Entretanto, sua saída não será considerada automaticamente confiável.
+
+A pessoa responsável pelo sistema deverá ser capaz de justificar, compreender ou validar aquilo que será incorporado ao ambiente.
 
 A regra da POC será:
 
@@ -151,16 +203,22 @@ A regra da POC será:
 ## 8. Fluxo analisado
 
 ```text
-Desenvolvedor
+Necessidade real
       |
       v
-      IA
+Requisitos / Especificação
+      |
+      v
+Desenvolvedor + IA
       |
       v
 Código / Configuração / Infraestrutura
       |
       v
-Validações de segurança
+Minimização + Validação independente
+      |
+      v
+Rastreabilidade
       |
       v
      Git
@@ -176,19 +234,48 @@ Validações de segurança
       |
       v
  Aplicação
+      |
+      v
+Operação / Evolução
 ```
 
 Paralelamente, secrets e credenciais deverão possuir gerenciamento e controle de acesso apropriados, incluindo a utilização do OpenBao quando aplicável.
 
 ---
 
-## 9. Escopo
+## 9. Critérios de controle humano
+
+Ao longo da POC, quatro critérios serão tratados como transversais:
+
+### Rastreabilidade
+
+É possível identificar a origem e as alterações relevantes do artefato?
+
+### Confiabilidade
+
+Existem evidências independentes de que o artefato atende aos critérios definidos?
+
+### Compreensibilidade
+
+A pessoa responsável consegue explicar e operar aquilo que foi incorporado?
+
+### Evolução
+
+O artefato pode ser atualizado e mantido de forma controlada ao longo do tempo?
+
+Esses critérios não significam que toda decisão deva ser executada manualmente. O objetivo é evitar que automação seja confundida com ausência de responsabilidade ou controle.
+
+---
+
+## 10. Escopo
 
 Serão analisadas principalmente boas práticas relacionadas a:
 
+- requisitos e especificação;
 - código;
 - secrets;
-- dependências;
+- dependências e bibliotecas;
+- atualidade e origem de componentes;
 - Git;
 - CI/CD;
 - Docker;
@@ -197,13 +284,15 @@ Serão analisadas principalmente boas práticas relacionadas a:
 - gestão de credenciais;
 - OpenBao;
 - logs;
+- rastreabilidade;
+- validação independente;
 - configurações produzidas ou modificadas com auxílio de IA.
 
 O foco estará nos pequenos detalhes capazes de aumentar a superfície de ataque mesmo quando a aplicação continua funcionando normalmente.
 
 ---
 
-## 10. Fora do escopo
+## 11. Fora do escopo
 
 A POC não pretende:
 
@@ -211,8 +300,10 @@ A POC não pretende:
 - treinar modelos;
 - analisar a arquitetura interna de um LLM;
 - provar que toda saída produzida por IA é insegura;
+- provar que desenvolvimento humano é sempre mais seguro;
 - substituir desenvolvedores;
-- substituir revisão humana;
+- eliminar o uso de IA na revisão;
+- substituir completamente revisão humana;
 - implementar todos os controles existentes de cibersegurança;
 - construir uma infraestrutura completa de produção;
 - eliminar todos os riscos possíveis.
@@ -221,27 +312,29 @@ O objetivo é demonstrar **boas práticas aplicáveis e reproduzíveis**.
 
 ---
 
-## 11. Hipótese
+## 12. Hipótese
 
 A hipótese da POC é:
 
-**A aplicação sistemática de boas práticas de Security by Design durante o desenvolvimento assistido por IA permite identificar pequenos problemas de código, configuração, privilégios, dependências e infraestrutura antes que eles se acumulem e ampliem silenciosamente a superfície de ataque da aplicação.**
+**A aplicação sistemática de boas práticas de Security by Design durante todo o ciclo de desenvolvimento assistido por IA — começando nos requisitos e incluindo minimização, validação independente, rastreabilidade e controle de dependências — permite identificar problemas antes que eles se acumulem e ampliem silenciosamente a superfície de ataque ou reduzam a capacidade humana de compreender e operar o sistema.**
 
 ---
 
-## 12. Mensagem principal da POC
+## 13. Mensagem principal da POC
 
-A POC será construída sobre três ideias:
+A POC será construída sobre quatro ideias:
 
 **Funcionar não significa estar seguro.**
 
 **A segurança também está nos pequenos detalhes.**
 
+**Não basta perguntar se funciona. É preciso perguntar se precisa existir.**
+
 **IA auxilia. Boas práticas orientam. Segurança valida.**
 
 ---
 
-## 13. Resultado do Passo 1
+## 14. Resultado do Passo 1
 
 Ao final deste passo ficam definidos:
 
@@ -252,6 +345,7 @@ Ao final deste passo ficam definidos:
 - os objetivos específicos;
 - os princípios orientadores;
 - o papel da IA;
+- os critérios de controle humano;
 - o escopo;
 - o que está fora do escopo;
 - a hipótese que a POC pretende avaliar.
